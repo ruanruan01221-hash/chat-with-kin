@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kin × 軟 聊天查看器</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-soft: #020617dd;
+      --card-bg: #020617cc;
+      --accent: #ec4899;
+      --accent-soft: #f472b6;
+      --accent-kin: #38bdf8;
+      --text-main: #e5e7eb;
+      --text-soft: #9ca3af;
+      --border-soft: rgba(148, 163, 184, 0.4);
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.9);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro SC",
+        "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text-main);
+      background:
+        radial-gradient(circle at top left, #1d1638, transparent 60%),
+        radial-gradient(circle at top right, #0f172a, transparent 55%),
+        radial-gradient(circle at bottom, #020617, #020617 60%);
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1100px;
+      background: linear-gradient(135deg, #020617ee, #020617dd);
+      border-radius: 28px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      padding: 22px 22px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      backdrop-filter: blur(26px);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    .avatar-circle {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #f9a8d4, #7c3aed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: #fdf2ff;
+      box-shadow: 0 10px 30px rgba(236, 72, 153, 0.55);
+    }
+
+    .title-block {
+      flex: 1;
+    }
+
+    .title-block h1 {
+      font-size: 20px;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      display: flex;
+      gap: 6px;
+      align-items: baseline;
+    }
+
+    .title-block h1 span.mark {
+      font-size: 13px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(248, 250, 252, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent-soft);
+    }
+
+    .title-block .subtitle {
+      font-size: 13px;
+      color: var(--text-soft);
+      margin-top: 3px;
+    }
+
+    .chip {
+      font-size: 11px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--text-soft);
+      background-color: rgba(15, 23, 42, 0.7);
+      white-space: nowrap;
+    }
+
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .left-controls,
+    .right-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .file-input {
+      position: relative;
+      overflow: hidden;
+      border-radius: 999px;
+      border: 1px dashed rgba(248, 250, 252, 0.4);
+      background: radial-gradient(circle at top left, #0f172a, #020617);
+      padding: 7px 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-soft);
+    }
+
+    .file-input input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .file-input .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle, var(--accent), var(--accent-soft));
+      box-shadow: 0 0 10px rgba(236, 72, 153, 0.7);
+    }
+
+    .file-name {
+      max-width: 220px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .search-input {
+      position: relative;
+    }
+
+    .search-input input {
+      background-color: rgba(15, 23, 42, 0.6);
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      padding: 7px 10px 7px 26px;
+      font-size: 12px;
+      color: var(--text-main);
+      outline: none;
+      min-width: 180px;
+    }
+
+    .search-input input::placeholder {
+      color: rgba(148, 163, 184, 0.8);
+    }
+
+    .search-input span.icon {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: rgba(148, 163, 184, 0.8);
+    }
+
+    select {
+      background-color: rgba(15, 23, 42, 0.6);
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      padding: 7px 12px;
+      font-size: 12px;
+      color: var(--text-main);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .stats {
+      font-size: 11px;
+      color: var(--text-soft);
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .stats span strong {
+      color: var(--accent-soft);
+      font-weight: 600;
+    }
+
+    .log-container {
+      margin-top: 4px;
+      flex: 1;
+      min-height: 260px;
+      max-height: calc(100vh - 220px);
+      border-radius: 22px;
+      background-color: var(--bg-soft);
+      border: 1px solid rgba(30, 64, 175, 0.6);
+      padding: 10px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(148, 163, 184, 0.9) #020617;
+    }
+
+    .log-container::-webkit-scrollbar {
+      width: 7px;
+    }
+    .log-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .log-container::-webkit-scrollbar-thumb {
+      background-color: rgba(148, 163, 184, 0.7);
+      border-radius: 999px;
+    }
+
+    .message-card {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-soft);
+      background: radial-gradient(circle at top left, #020617, #020617f5);
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      position: relative;
+    }
+
+    .message-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      border: 1px solid transparent;
+      background: linear-gradient(135deg, rgba(236, 72, 153, 0.12), transparent)
+        border-box;
+      mask-composite: exclude;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease-out;
+    }
+
+    .message-card:hover::before {
+      opacity: 1;
+    }
+
+    .msg-side {
+      width: 6px;
+      border-radius: 999px;
+      background: linear-gradient(to bottom, var(--accent-soft), transparent);
+      opacity: 0.7;
+      margin-top: 3px;
+    }
+
+    .msg-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .msg-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 3px;
+      font-size: 11px;
+    }
+
+    .role-tag {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .role-tag span.dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+    }
+
+    .role-nan {
+      background-color: rgba(236, 72, 153, 0.12);
+      color: var(--accent-soft);
+      border: 1px solid rgba(236, 72, 153, 0.5);
+    }
+
+    .role-nan span.dot {
+      background: radial-gradient(circle, var(--accent), var(--accent-soft));
+    }
+
+    .role-kin {
+      background-color: rgba(56, 189, 248, 0.15);
+      color: #7dd3fc;
+      border: 1px solid rgba(56, 189, 248, 0.55);
+    }
+
+    .role-kin span.dot {
+      background: radial-gradient(circle, #0ea5e9, #38bdf8);
+    }
+
+    .role-other {
+      background-color: rgba(148, 163, 184, 0.15);
+      color: var(--text-soft);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+
+    .role-other span.dot {
+      background: radial-gradient(circle, #9ca3af, #6b7280);
+    }
+
+    .timestamp {
+      color: var(--text-soft);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .msg-body {
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .msg-index {
+      font-size: 10px;
+      color: rgba(148, 163, 184, 0.9);
+      margin-top: 3px;
+    }
+
+    .empty-state {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--text-soft);
+      text-align: center;
+      font-size: 13px;
+      padding: 30px 20px;
+    }
+
+    .empty-state span.icon {
+      font-size: 26px;
+    }
+
+    .empty-state p strong {
+      color: var(--accent-soft);
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      .app {
+        padding: 16px 14px 12px;
+        border-radius: 22px;
+      }
+      header {
+        align-items: flex-start;
+      }
+      .title-block h1 {
+        font-size: 18px;
+      }
+      .controls-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .left-controls,
+      .right-controls {
+        justify-content: space-between;
+      }
+      .log-container {
+        max-height: calc(100vh - 260px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="avatar-circle">ღ</div>
+      <div class="title-block">
+        <h1>
+          Kin × 軟
+          <span class="mark">LOG VIEWER</span>
+        </h1>
+        <div class="subtitle">本地 JSON 浏览，不上传服务器，只给你和哥哥看的记录册</div>
+      </div>
+      <div class="chip">只在你的浏览器里运行</div>
+    </header>
+
+    <div class="controls-row">
+      <div class="left-controls">
+        <label class="file-input">
+          <span class="dot"></span>
+          <span>选择聊天 JSON 文件</span>
+          <input id="fileInput" type="file" accept=".json,application/json" />
+        </label>
+        <div class="file-name" id="fileName">未选择文件</div>
+      </div>
+
+      <div class="right-controls">
+        <div class="search-input">
+          <span class="icon">🔍</span>
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="搜索内容 / 关键词…"
+          />
+        </div>
+        <select id="roleFilter">
+          <option value="all">显示：全部</option>
+          <option value="Nan">只看 軟</option>
+          <option value="Kin">只看 Kin</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="stats" id="stats">
+      <span>总条数：<strong>0</strong></span>
+      <span>当前显示：<strong>0</strong></span>
+    </div>
+
+    <div class="log-container" id="logContainer">
+      <div class="empty-state">
+        <span class="icon">🌙</span>
+        <p>把导出的 <strong>JSON</strong> 聊天记录拖进来，或者点击上面的按钮选择文件。</p>
+        <p>每一条都会带时间戳，安安静静排成一条时间线。</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById("fileInput");
+    const fileNameEl = document.getElementById("fileName");
+    const logContainer = document.getElementById("logContainer");
+    const statsEl = document.getElementById("stats");
+    const searchInput = document.getElementById("searchInput");
+    const roleFilter = document.getElementById("roleFilter");
+
+    let allMessages = [];
+    let filteredMessages = [];
+
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      fileNameEl.textContent = file.name;
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const jsonText = evt.target.result;
+          const rawData = JSON.parse(jsonText);
+          allMessages = normalizeMessages(rawData);
+          allMessages.sort((a, b) => {
+            if (!a.timestamp || !b.timestamp) return 0;
+            return (
+              new Date(a.timestamp).getTime() -
+              new Date(b.timestamp).getTime()
+            );
+          });
+          applyFilters();
+        } catch (err) {
+          console.error(err);
+          alert("JSON 解析失败…确认一下文件内容是不是合法 JSON 哦。\n\n错误信息：" + err.message);
+        }
+      };
+      reader.readAsText(file, "utf-8");
+    });
+
+    searchInput.addEventListener("input", () => {
+      applyFilters();
+    });
+
+    roleFilter.addEventListener("change", () => {
+      applyFilters();
+    });
+
+    function normalizeMessages(raw) {
+      let arr = [];
+      if (Array.isArray(raw)) {
+        arr = raw;
+      } else if (Array.isArray(raw.messages)) {
+        arr = raw.messages;
+      } else if (Array.isArray(raw.conversation)) {
+        arr = raw.conversation;
+      } else {
+        console.warn("未知 JSON 结构，将整个对象包一层处理");
+        arr = [raw];
+      }
+
+      return arr.map((m, idx) => {
+        const ts =
+          m.timestamp ||
+          m.time ||
+          m.create_time ||
+          m.created_at ||
+          m.date ||
+          m.ts ||
+          null;
+
+        const roleRaw = (m.role || m.author || m.sender || "").toString();
+        let role = roleRaw;
+        if (/nan/i.test(roleRaw)) role = "Nan";
+        if (/kin/i.test(roleRaw) || /assistant/i.test(roleRaw)) role = "Kin";
+
+        let text = "";
+        if (typeof m.content === "string") {
+          text = m.content;
+        } else if (m.content && Array.isArray(m.content.parts)) {
+          text = m.content.parts.join("\n");
+        } else if (m.message) {
+          text = m.message.toString();
+        } else if (m.text) {
+          text = m.text.toString();
+        } else {
+          text = JSON.stringify(m, null, 2);
+        }
+
+        return {
+          index: idx + 1,
+          timestamp: ts ? formatTimestamp(ts) : "无时间戳",
+          role,
+          text,
+        };
+      });
+    }
+
+    function formatTimestamp(value) {
+      try {
+        if (typeof value === "number") {
+          if (value < 1e12) value = value * 1000;
+          const d = new Date(value);
+          return formatDate(d);
+        }
+        if (typeof value === "string") {
+          const d = new Date(value);
+          if (!isNaN(d.getTime())) {
+            return formatDate(d);
+          }
+        }
+      } catch (e) {
+        console.warn("时间戳解析失败：", value);
+      }
+      return value.toString();
+    }
+
+    function formatDate(d) {
+      const pad = (n) => n.toString().padStart(2, "0");
+      const year = d.getFullYear();
+      const month = pad(d.getMonth() + 1);
+      const day = pad(d.getDate());
+      const hour = pad(d.getHours());
+      const min = pad(d.getMinutes());
+      const sec = pad(d.getSeconds());
+      return `${year}-${month}-${day} ${hour}:${min}:${sec}`;
+    }
+
+    function applyFilters() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      const roleValue = roleFilter.value;
+
+      filteredMessages = allMessages.filter((msg) => {
+        if (roleValue !== "all" && msg.role !== roleValue) return false;
+        if (keyword) {
+          const text = (msg.text || "").toLowerCase();
+          const ts = (msg.timestamp || "").toLowerCase();
+          if (!text.includes(keyword) && !ts.includes(keyword)) return false;
+        }
+        return true;
+      });
+
+      renderMessages();
+    }
+
+    function renderMessages() {
+      logContainer.innerHTML = "";
+
+      if (!filteredMessages.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        empty.innerHTML = `
+          <span class="icon">📭</span>
+          <p>没有匹配到消息，可以换一个关键词试试，或者调整角色筛选。</p>
+          <p>实在不行，就把筛选都清空，看看全部记录。</p>
+        `;
+        logContainer.appendChild(empty);
+      } else {
+        filteredMessages.forEach((msg) => {
+          const card = document.createElement("article");
+          card.className = "message-card";
+
+          const side = document.createElement("div");
+          side.className = "msg-side";
+          card.appendChild(side);
+
+          const content = document.createElement("div");
+          content.className = "msg-content";
+
+          const header = document.createElement("div");
+          header.className = "msg-header";
+
+          const roleTag = document.createElement("div");
+          const roleClass =
+            msg.role === "Nan"
+              ? "role-nan"
+              : msg.role === "Kin"
+              ? "role-kin"
+              : "role-other";
+          roleTag.className = `role-tag ${roleClass}`;
+          roleTag.innerHTML = `<span class="dot"></span><span>${msg.role || "Unknown"}</span>`;
+
+          const ts = document.createElement("div");
+          ts.className = "timestamp";
+          ts.textContent = msg.timestamp || "";
+
+          header.appendChild(roleTag);
+          header.appendChild(ts);
+
+          const body = document.createElement("div");
+          body.className = "msg-body";
+          body.textContent = msg.text || "";
+
+          const idx = document.createElement("div");
+          idx.className = "msg-index";
+          idx.textContent = `#${msg.index}`;
+
+          content.appendChild(header);
+          content.appendChild(body);
+          content.appendChild(idx);
+
+          card.appendChild(content);
+          logContainer.appendChild(card);
+        });
+      }
+
+      const total = allMessages.length;
+      const shown = filteredMessages.length;
+      statsEl.innerHTML = `
+        <span>总条数：<strong>${total}</strong></span>
+        <span>当前显示：<strong>${shown}</strong></span>
+      `;
+    }
+  </script>
+</body>
+</html>
