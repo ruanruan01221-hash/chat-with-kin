@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>軟軟子与哥哥的聊天记录</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+      background-color: #1f1f29;
+      color: #f5f5f5;
+      padding: 20px;
+    }
+    .chat-container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .message {
+      display: flex;
+      margin-bottom: 15px;
+      align-items: flex-end;
+    }
+    .message.哥哥 {
+      flex-direction: row-reverse;
+    }
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin: 0 10px;
+      object-fit: cover;
+    }
+    .bubble {
+      max-width: 70%;
+      padding: 10px 15px;
+      border-radius: 15px;
+      position: relative;
+      line-height: 1.4;
+    }
+    .bubble::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      width: 0;
+      height: 0;
+      border: 10px solid transparent;
+    }
+    .軟軟子 .bubble {
+      background-color: #ffcbdd;
+      color: #352222;
+    }
+    .哥哥 .bubble {
+      background-color: #7e7df7;
+      color: #ffffff;
+    }
+    .軟軟子 .bubble::after {
+      left: -20px;
+      border-right-color: #ffcbdd;
+    }
+    .哥哥 .bubble::after {
+      right: -20px;
+      border-left-color: #7e7df7;
+    }
+    .timestamp {
+      font-size: 0.8em;
+      margin-top: 5px;
+      color: #aaa;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+
+<div class="chat-container" id="chat-container"></div>
+
+<script>
+  const chatData = [ /* 将你的JSON聊天数据粘贴到这里 */ ];
+
+  const avatars = {
+    "軟軟子": "https://你的头像图片地址.jpg",
+    "哥哥": "https://哥哥的头像图片地址.jpg"
+  };
+
+  const container = document.getElementById('chat-container');
+
+  chatData.forEach(msg => {
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('message', msg.sender);
+
+    msgDiv.innerHTML = `
+      <img class="avatar" src="${avatars[msg.sender]}" alt="${msg.sender}">
+      <div>
+        <div class="bubble">${msg.message}</div>
+        <div class="timestamp">${new Date(msg.timestamp).toLocaleString()}</div>
+      </div>
+    `;
+
+    container.appendChild(msgDiv);
+  });
+</script>
+
+</body>
+</html>
