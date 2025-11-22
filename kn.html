@@ -81,6 +81,24 @@
       line-height: 1.4;
     }
 
+    .search-box {
+      margin-top: 10px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #f1c5dd;
+      font-size: 12px;
+      outline: none;
+      background: rgba(255,255,255,0.9);
+    }
+
+    .search-input::placeholder {
+      color: #c9a2bb;
+    }
+
     .conversation-list {
       flex: 1;
       overflow-y: auto;
@@ -372,6 +390,14 @@
     }
     .message-row.user .meta-line { text-align: right; }
 
+    /* 搜索命中高亮 */
+    mark {
+      background: #ffe07f;
+      color: inherit;
+      padding: 0 1px;
+      border-radius: 2px;
+    }
+
     .main-footer {
       padding: 6px 14px 9px;
       font-size: 11px;
@@ -411,8 +437,6 @@
 
       .bubble { font-size: 15px; }
     }
-
-    .hidden-input { display: none; }
   </style>
 </head>
 <body>
@@ -425,8 +449,10 @@
           <span>ChatGPT 聊天列表</span>
         </div>
         <div class="sidebar-sub">
-          请在右上角 <b>⚙ → 导入聊天</b> 选择导出的 conversations.json 或文本文件，
-          这里只用来选择会话窗口。
+          请在右上角 <b>⚙ → 导入聊天</b> 选择导出的 JSON / 文本文件，这里只用来选择会话窗口。
+        </div>
+        <div class="search-box">
+          <input id="searchInput" class="search-input" type="text" placeholder="搜索聊天内容…" />
         </div>
       </div>
       <div id="conversationList" class="conversation-list"></div>
@@ -451,8 +477,7 @@
           <div class="settings collapsed" id="settingsPanel">
             <label>
               导入聊天
-              <input id="fileInputHeader" type="file" class="hidden-input" accept=".json,.txt" />
-              <button class="icon-btn" id="fileInputHeaderBtn">选择文件</button>
+              <input id="fileInputHeader" type="file" multiple accept=".json,.txt" />
             </label>
             <label>
               用户头像
@@ -478,23 +503,24 @@
       <div id="chatBody" class="chat-body">
         <div class="chat-empty">
           <div class="chat-empty-emoji">૮₍｡• ᴗ •｡₎ა</div>
-          <div>点右上角「⚙ → 选择文件」，<br>左边选窗口，右边就会出现完整聊天记录哦。</div>
+          <div>点右上角「⚙ → 导入聊天」，<br>左边选窗口，右边就会出现完整聊天记录哦。</div>
         </div>
       </div>
 
       <footer class="main-footer">
         <span>提示：</span>仅展示 <code>user</code> / <code>assistant</code> 消息，忽略 system / tool，
         空内容自动跳过。若导出文件里带模型字段，会显示在时间后面。<br>
-        对于官方导出的 JSON，会沿着当前节点只取“最后那条主线”，不会把分支全部展开。
+        对于官方导出的 JSON，会沿着当前节点只取“最后那条主线”，不会把分支全部展开。会话列表按开始时间从新到旧排序。
       </footer>
     </section>
   </div>
 
   <script>
     const state = {
-      conversations: [],
+      conversations: [],   // {id,title,subtitle,firstTimeValue,messages:[{...}]}
       activeId: null,
-      avatars: { user: "", assistant: "" }
+      avatars: { user: "", assistant: "" },
+      searchQuery: ""
     };
 
     marked.setOptions({ breaks: true, gfm: true });
@@ -504,8 +530,8 @@
     const toggleSettingsBtn = document.getElementById("toggleSettingsBtn");
     const settingsPanel = document.getElementById("settingsPanel");
 
+    const searchInput = document.getElementById("searchInput");
     const fileInputHeader = document.getElementById("fileInputHeader");
-    const fileInputHeaderBtn = document.getElementById("fileInputHeaderBtn");
     const conversationListEl = document.getElementById("conversationList");
     const chatBodyEl = document.getElementById("chatBody");
     const chatTitleEl = document.getElementById("chatTitle");
@@ -516,6 +542,7 @@
     const userAvatarFileInput = document.getElementById("userAvatarFile");
     const assistantAvatarFileInput = document.getElementById("assistantAvatarFile");
 
+    /* 侧栏 & 设置开关 */
     function toggleSidebar() {
       if (window.innerWidth > 900) return;
       sidebar.classList.toggle("open");
@@ -529,12 +556,14 @@
       settingsPanel.classList.remove("collapsed");
     }
 
-    fileInputHeaderBtn.addEventListener("click", () => {
-      fileInputHeader.click();
+    /* 搜索输入 */
+    searchInput.addEventListener("input", (e) => {
+      state.searchQuery = e.target.value.trim();
+      renderConversationList();
+      renderActiveConversation(); // 让右侧高亮跟着变
     });
 
-    if (fileInputHeader) fileInputHeader.addEventListener("change", handleJsonFiles, false);
-
+    /* 颜色 & 背景 */
     bgColorInput.addEventListener("input", (e) => {
       document.documentElement.style.setProperty("--chat-bg", e.target.value);
       document.body.style.backgroundColor = e.target.value;
@@ -550,6 +579,7 @@
       reader.readAsDataURL(file);
     });
 
+    /* 头像上传 */
     userAvatarFileInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -572,7 +602,10 @@
       reader.readAsDataURL(file);
     });
 
-    function handleJsonFiles(e) {
+    /* 导入文件 */
+    if (fileInputHeader) fileInputHeader.addEventListener("change", handleFiles, false);
+
+    function handleFiles(e) {
       const files = Array.from(e.target.files || []);
       if (!files.length) return;
 
@@ -593,6 +626,8 @@
             state.conversations.push(c);
           });
 
+          sortConversationsByTime();
+
           if (!state.activeId && state.conversations.length) {
             state.activeId = state.conversations[0].id;
           }
@@ -604,7 +639,13 @@
       });
     }
 
-    /* ---- JSON 主线解析 ---- */
+    function sortConversationsByTime() {
+      state.conversations.sort(
+        (a, b) => (b.firstTimeValue || 0) - (a.firstTimeValue || 0)
+      );
+    }
+
+    /* ------- 解析 JSON：只取主线 + 模型 + 开始时间 ------- */
     function parseFromJsonExport(json, filename) {
       const convs = [];
       let arr = [];
@@ -617,24 +658,38 @@
       arr.forEach((conv, index) => {
         const title = conv.title || `${stripExt(filename)} #${index + 1}`;
         const messages = [];
+        let firstRawTime = null;
 
         if (conv.mapping) {
           const mapping = conv.mapping;
           if (conv.current_node && mapping[conv.current_node]) {
             const pathNodes = buildMainPath(mapping, conv.current_node);
-            pathNodes.forEach((node) => {
+            pathNodes.forEach((node, idx) => {
               const msg = node.message;
               if (!msg) return;
               const author = msg.author || {};
               const role = author.role;
               if (role !== "user" && role !== "assistant") return;
 
-              const { text } = extractTextOnly(msg);
-              const trimmed = (text || "").trim();
+              let content = "";
+              if (msg.content) {
+                if (Array.isArray(msg.content.parts)) {
+                  content = msg.content.parts.join("\n");
+                } else if (typeof msg.content === "string") {
+                  content = msg.content;
+                } else if (msg.content.text) {
+                  content = msg.content.text;
+                }
+              }
+              const trimmed = (content || "").trim();
               if (!trimmed) return;
 
-              const rawTime = msg.create_time || 0;
-              const timestamp = rawTime ? formatTimestampFromSeconds(rawTime) : "";
+              const rawTime = msg.create_time ?? idx;
+              const timestamp = msg.create_time
+                ? formatTimestampFromSeconds(msg.create_time)
+                : "";
+
+              if (firstRawTime == null) firstRawTime = rawTime;
               const model = detectModel(msg);
 
               messages.push({ role, timestamp, content: trimmed, model });
@@ -647,19 +702,31 @@
               const role = msg.author && msg.author.role;
               if (role !== "user" && role !== "assistant") return;
 
-              const { text } = extractTextOnly(msg);
-              const trimmed = (text || "").trim();
+              let content = "";
+              if (msg.content) {
+                if (Array.isArray(msg.content.parts)) {
+                  content = msg.content.parts.join("\n");
+                } else if (typeof msg.content === "string") {
+                  content = msg.content;
+                } else if (msg.content.text) {
+                  content = msg.content.text;
+                }
+              }
+              const trimmed = (content || "").trim();
               if (!trimmed) return;
 
-              const rawTime = msg.create_time || 0;
-              const timestamp = rawTime ? formatTimestampFromSeconds(rawTime) : "";
+              const rawTime = msg.create_time ?? 0;
+              const timestamp = msg.create_time
+                ? formatTimestampFromSeconds(msg.create_time)
+                : "";
               const model = detectModel(msg);
 
               temp.push({ role, timestamp, content: trimmed, model, _rawTime: rawTime });
             });
 
             temp.sort((a, b) => (a._rawTime || 0) - (b._rawTime || 0));
-            temp.forEach((m) => {
+            temp.forEach((m, idx) => {
+              if (firstRawTime == null) firstRawTime = m._rawTime ?? idx;
               delete m._rawTime;
               messages.push(m);
             });
@@ -671,11 +738,20 @@
             const role = m.role || (m.author && m.author.role);
             if (role !== "user" && role !== "assistant") return;
 
-            const { text } = extractTextOnly(m);
-            const trimmed = (text || "").trim();
+            let content = "";
+            if (m.content) {
+              if (Array.isArray(m.content.parts)) {
+                content = m.content.parts.join("\n");
+              } else if (typeof m.content === "string") {
+                content = m.content;
+              } else if (m.content.text) {
+                content = m.content.text;
+              }
+            }
+            const trimmed = (content || "").trim();
             if (!trimmed) return;
 
-            const rawTime = m.create_time || idx;
+            const rawTime = m.create_time ?? idx;
             const timestamp = m.create_time
               ? formatTimestampFromSeconds(m.create_time)
               : "";
@@ -685,53 +761,35 @@
           });
 
           temp.sort((a, b) => (a._rawTime || 0) - (b._rawTime || 0));
-          temp.forEach((m) => {
+          temp.forEach((m, idx) => {
+            if (firstRawTime == null) firstRawTime = m._rawTime ?? idx;
             delete m._rawTime;
             messages.push(m);
           });
         }
 
         if (messages.length) {
-          const firstTime = messages[0].timestamp || "";
+          const firstTimeStr = messages[0].timestamp || "";
+          const firstVal =
+            firstRawTime != null
+              ? firstRawTime
+              : firstTimeStr
+              ? parseTimeStringToSeconds(firstTimeStr)
+              : 0;
+
           convs.push({
             id: conv.id || `${filename}-${index}`,
             title,
-            subtitle: firstTime
-              ? `从 ${firstTime} 开始 · ${messages.length} 条消息`
+            subtitle: firstTimeStr
+              ? `从 ${firstTimeStr} 开始 · ${messages.length} 条消息`
               : `${messages.length} 条消息`,
-            messages
+            messages,
+            firstTimeValue: firstVal
           });
         }
       });
 
       return convs;
-    }
-
-    // 只提取文字（不管图片）
-    function extractTextOnly(msg) {
-      const c = msg.content;
-      let parts = [];
-      if (!c) return { text: "" };
-
-      if (Array.isArray(c.parts)) {
-        c.parts.forEach((p) => {
-          if (typeof p === "string") {
-            parts.push(p);
-          } else if (p && typeof p === "object") {
-            if (p.content_type === "text" && p.text && typeof p.text.value === "string") {
-              parts.push(p.text.value);
-            }
-          }
-        });
-      } else if (typeof c === "string") {
-        parts.push(c);
-      } else if (c.text && typeof c.text === "string") {
-        parts.push(c.text);
-      } else if (c.text && typeof c.text.value === "string") {
-        parts.push(c.text.value);
-      }
-
-      return { text: parts.join("\n") };
     }
 
     function buildMainPath(mapping, currentId) {
@@ -766,12 +824,16 @@
         /【(user|assistant)】\s*\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]\s*([\s\S]*?)(?=\n【(?:user|assistant)】\s*\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]|$)/g;
 
       let match;
+      let firstVal = null;
+
       while ((match = re.exec(text)) !== null) {
         const role = match[1];
         const ts = match[2];
         const contentRaw = match[3] || "";
         const content = contentRaw.trim();
         if (!content) continue;
+        const val = parseTimeStringToSeconds(ts);
+        if (firstVal == null) firstVal = val;
         messages.push({ role, timestamp: ts, content, model: "" });
       }
 
@@ -781,7 +843,8 @@
         subtitle: messages.length
           ? `从 ${messages[0].timestamp} 开始 · ${messages.length} 条消息`
           : "未解析到有效消息",
-        messages
+        messages,
+        firstTimeValue: firstVal ?? 0
       };
     }
 
@@ -801,11 +864,40 @@
       return `${y}-${m}-${day} ${h}:${mi}:${s}`;
     }
 
+    function parseTimeStringToSeconds(ts) {
+      // "YYYY-MM-DD HH:MM:SS" -> UTC 秒
+      const m = ts.match(
+        /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/
+      );
+      if (!m) return 0;
+      const [_, y, mo, d, h, mi, s] = m;
+      return Date.UTC(
+        Number(y),
+        Number(mo) - 1,
+        Number(d),
+        Number(h),
+        Number(mi),
+        Number(s)
+      ) / 1000;
+    }
+
+    /* ------- 渲染会话列表（带搜索过滤） ------- */
     function renderConversationList() {
       conversationListEl.innerHTML = "";
       if (!state.conversations.length) return;
 
-      state.conversations.forEach((conv) => {
+      const q = state.searchQuery.toLowerCase();
+      let list = state.conversations.slice();
+
+      if (q) {
+        list = list.filter((conv) =>
+          conv.messages.some((m) =>
+            (m.content || "").toLowerCase().includes(q)
+          )
+        );
+      }
+
+      list.forEach((conv) => {
         const item = document.createElement("div");
         item.className = "conversation-item";
         if (conv.id === state.activeId) item.classList.add("active");
@@ -838,6 +930,10 @@
       return parts.join(" · ");
     }
 
+    function escapeRegExp(str) {
+      return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
     function renderActiveConversation() {
       const conv = state.conversations.find((c) => c.id === state.activeId);
 
@@ -858,6 +954,9 @@
       chatSubtitleEl.textContent = conv.subtitle || "";
 
       chatBodyEl.innerHTML = "";
+
+      const q = state.searchQuery.trim();
+      const highlightRegex = q ? new RegExp(escapeRegExp(q), "gi") : null;
 
       conv.messages.forEach((msg) => {
         const row = document.createElement("div");
@@ -886,9 +985,17 @@
         const contentDiv = document.createElement("div");
         contentDiv.className = "markdown-body";
         try {
-          contentDiv.innerHTML = marked.parse(msg.content || "");
+          contentDiv.innerHTML = marked.parse(msg.content);
         } catch {
-          contentDiv.textContent = msg.content || "";
+          contentDiv.textContent = msg.content;
+        }
+
+        // 搜索词高亮
+        if (highlightRegex) {
+          contentDiv.innerHTML = contentDiv.innerHTML.replace(
+            highlightRegex,
+            (m) => `<mark>${m}</mark>`
+          );
         }
 
         bubble.appendChild(contentDiv);
