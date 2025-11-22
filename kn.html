@@ -2,7 +2,6 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ChatGPT 聊天查看器</title>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
@@ -45,17 +44,15 @@
         0 0 0 1px rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(14px);
       background: rgba(255, 255, 255, 0.88);
-      position: relative;
     }
 
-    /* 侧边栏 */
+    /* 左侧侧边栏 */
     .sidebar {
       width: var(--sidebar-width);
       border-right: 1px solid var(--border-soft);
       display: flex;
       flex-direction: column;
       background: linear-gradient(180deg, #ffeaf4 0%, #ffffff 40%, #fffafc 100%);
-      z-index: 10;
     }
 
     .sidebar-header {
@@ -72,26 +69,28 @@
       gap: 8px;
     }
 
-    .sidebar-header-title span.emoji { font-size: 20px; }
+    .sidebar-header-title span.emoji {
+      font-size: 20px;
+    }
 
-    .sidebar-sub {
-      margin-top: 8px;
+    .file-input-row {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-sub);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .file-input-row input[type="file"] {
+      font-size: 12px;
+    }
+
+    .hint {
       font-size: 11px;
       color: #b38aa0;
       line-height: 1.4;
     }
-
-    .search-box { margin-top: 10px; }
-    .search-input {
-      width: 100%;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid #f1c5dd;
-      font-size: 12px;
-      outline: none;
-      background: rgba(255,255,255,0.9);
-    }
-    .search-input::placeholder { color: #c9a2bb; }
 
     .conversation-list {
       flex: 1;
@@ -109,7 +108,11 @@
       gap: 4px;
       transition: all 0.15s ease;
     }
-    .conversation-item:hover { background: rgba(255, 224, 239, 0.7); }
+
+    .conversation-item:hover {
+      background: rgba(255, 224, 239, 0.7);
+    }
+
     .conversation-item.active {
       background: #ffd8eb;
       box-shadow: 0 0 0 1px #ff9ac6 inset;
@@ -123,6 +126,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
     .conversation-meta {
       font-size: 11px;
       color: var(--text-sub);
@@ -130,6 +134,7 @@
       justify-content: space-between;
       align-items: center;
     }
+
     .badge {
       padding: 2px 6px;
       border-radius: 999px;
@@ -139,7 +144,7 @@
       color: #b05787;
     }
 
-    /* 主区域 */
+    /* 右侧主区域 */
     .main {
       flex: 1;
       display: flex;
@@ -149,66 +154,30 @@
     }
 
     .main-header {
-      padding: 10px 12px;
+      padding: 12px 18px 10px;
       border-bottom: 1px solid rgba(255, 210, 231, 0.9);
       display: flex;
       align-items: center;
       justify-content: space-between;
       background: linear-gradient(90deg, #ffe7f1, #ffffff);
-      gap: 8px;
-      flex-wrap: wrap;
+      gap: 10px;
     }
 
     .main-header-left {
       display: flex;
       align-items: center;
-      gap: 8px;
-      min-width: 0;
-      flex: 1;
+      gap: 10px;
     }
 
     .chat-title {
       font-size: 16px;
       font-weight: 600;
       color: #444;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
+
     .chat-subtitle {
       font-size: 11px;
       color: #aa889c;
-    }
-
-    .title-block {
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-
-    .icon-btn {
-      border: none;
-      border-radius: 999px;
-      padding: 4px 9px;
-      font-size: 14px;
-      background: #ffd1e8;
-      color: #75415f;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.16);
-    }
-    .icon-btn:active { transform: translateY(1px); }
-
-    .settings-wrapper {
-      display: flex;
-      align-items: flex-start;
-      gap: 6px;
-    }
-    .settings-toggle-label {
-      font-size: 11px;
-      color: #a67792;
     }
 
     .settings {
@@ -221,18 +190,11 @@
       font-size: 11px;
       color: #a07f94;
     }
-    .settings.collapsed { display: none; }
 
     .settings label {
       display: flex;
       align-items: center;
       gap: 4px;
-      white-space: nowrap;
-    }
-
-    .settings input[type="file"] {
-      font-size: 11px;
-      max-width: 140px;
     }
 
     .settings input[type="color"] {
@@ -244,11 +206,18 @@
       background: transparent;
       cursor: pointer;
     }
+
+    .settings input[type="file"] {
+      font-size: 11px;
+      max-width: 160px;
+    }
+
     .settings small {
       color: #c09ab0;
       font-size: 10px;
     }
 
+    /* 聊天消息区 */
     .chat-body {
       flex: 1;
       overflow-y: auto;
@@ -267,7 +236,10 @@
       font-size: 13px;
       text-align: center;
     }
-    .chat-empty-emoji { font-size: 32px; }
+
+    .chat-empty-emoji {
+      font-size: 32px;
+    }
 
     .message-row {
       display: flex;
@@ -275,6 +247,7 @@
       margin-bottom: 10px;
       gap: 8px;
     }
+
     .message-row.assistant { flex-direction: row; }
     .message-row.user { flex-direction: row-reverse; }
 
@@ -292,6 +265,7 @@
       justify-content: center;
       font-size: 16px;
     }
+
     .avatar.assistant { background-color: #ffffff; color: #ff83b8; }
     .avatar.user { background-color: #ffbcd8; color: #ffffff; }
 
@@ -301,6 +275,7 @@
       flex-direction: column;
       align-items: flex-start;
     }
+
     .message-row.user .bubble-wrapper { align-items: flex-end; }
 
     .bubble {
@@ -314,10 +289,12 @@
         0 0 0 0.5px rgba(255, 255, 255, 0.8);
       word-break: break-word;
     }
+
     .message-row.assistant .bubble {
       background: var(--assistant-bubble);
       border-bottom-left-radius: 6px;
     }
+
     .message-row.user .bubble {
       background: var(--user-bubble);
       border-bottom-right-radius: 6px;
@@ -325,12 +302,14 @@
 
     .bubble .markdown-body p { margin: 0 0 4px; }
     .bubble .markdown-body p:last-child { margin-bottom: 0; }
+
     .bubble .markdown-body code {
       background: rgba(0, 0, 0, 0.04);
       padding: 1px 4px;
       border-radius: 4px;
       font-size: 12px;
     }
+
     .bubble .markdown-body pre {
       background: #1e1e1e;
       color: #f4f4f4;
@@ -339,38 +318,35 @@
       overflow-x: auto;
       font-size: 12px;
     }
+
     .bubble .markdown-body ul,
     .bubble .markdown-body ol {
       margin: 0 0 4px 18px;
       padding: 0;
     }
+
     .bubble .markdown-body h1,
     .bubble .markdown-body h2,
     .bubble .markdown-body h3 {
       margin: 4px 0;
       font-size: 15px;
     }
+
     .bubble .markdown-body a {
       color: #e16ea5;
       text-decoration: none;
       border-bottom: 1px dashed #e16ea5;
     }
+
     .bubble .markdown-body a:hover { text-decoration: underline; }
 
+    /* 时间+模型 放在气泡下面 */
     .meta-line {
       margin-top: 2px;
       font-size: 11px;
       color: #b59ab0;
     }
     .message-row.user .meta-line { text-align: right; }
-
-    /* 搜索高亮 */
-    mark {
-      background: #ffe07f;
-      color: inherit;
-      padding: 0 1px;
-      border-radius: 2px;
-    }
 
     .main-footer {
       padding: 6px 14px 9px;
@@ -379,6 +355,7 @@
       border-top: 1px dashed rgba(255, 210, 231, 0.9);
       text-align: right;
     }
+
     .main-footer span { color: #ff8bbf; }
 
     ::-webkit-scrollbar { width: 6px; }
@@ -392,41 +369,30 @@
       .app {
         margin: 0;
         border-radius: 0;
-        width: 100%;
         height: 100vh;
       }
-
-      .sidebar {
-        position: fixed;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 80%;
-        max-width: 320px;
-        transform: translateX(-100%);
-        transition: transform 0.25s ease;
-        box-shadow: 6px 0 18px rgba(0,0,0,0.15);
-      }
-      .sidebar.open { transform: translateX(0); }
-
-      .bubble { font-size: 15px; }
+      .sidebar { display: none; }
     }
   </style>
 </head>
 <body>
   <div class="app">
     <!-- 左侧导航 -->
-    <aside class="sidebar" id="sidebar">
+    <aside class="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-header-title">
           <span class="emoji">🍓</span>
           <span>ChatGPT 聊天列表</span>
         </div>
-        <div class="sidebar-sub">
-          请在右上角 <b>⚙ → 导入聊天</b> 选择导出的 JSON / 文本文件，会话按开始时间从新到旧排序。
-        </div>
-        <div class="search-box">
-          <input id="searchInput" class="search-input" type="text" placeholder="搜索聊天内容…" />
+        <div class="file-input-row">
+          <label>
+            导入聊天文件（支持多个）：
+            <input id="fileInput" type="file" multiple accept=".json,.txt" />
+          </label>
+          <div class="hint">
+            · 优先按 JSON 解析 ChatGPT 导出文件，<br />
+            · 如果不是标准 JSON，会按类似 <code>【user】[时间]</code> 的文本格式解析。
+          </div>
         </div>
       </div>
       <div id="conversationList" class="conversation-list"></div>
@@ -436,75 +402,62 @@
     <section class="main">
       <header class="main-header">
         <div class="main-header-left">
-          <button class="icon-btn" id="toggleSidebarBtn">☰</button>
-          <div class="title-block">
+          <div>
             <div class="chat-title" id="chatTitle">还没有打开会话</div>
             <div class="chat-subtitle" id="chatSubtitle">
               导入导出的对话文件，就能像聊天软件一样看历史记录了。
             </div>
           </div>
         </div>
-
-        <div class="settings-wrapper">
-          <button class="icon-btn" id="toggleSettingsBtn">⚙</button>
-          <span class="settings-toggle-label">设置</span>
-          <div class="settings collapsed" id="settingsPanel">
-            <label>
-              导入聊天
-              <input id="fileInputHeader" type="file" multiple accept=".json,.txt" />
-            </label>
-            <label>
-              用户头像
-              <input type="file" id="userAvatarFile" accept="image/*" />
-            </label>
-            <label>
-              助手头像
-              <input type="file" id="assistantAvatarFile" accept="image/*" />
-            </label>
-            <label>
-              聊天背景色
-              <input type="color" id="bgColor" value="#ffeef6" />
-            </label>
-            <label>
-              背景图
-              <input type="file" id="bgImageInput" accept="image/*" />
-            </label>
-            <small>文件/头像/背景均在本地读取，不会上传。</small>
-          </div>
+        <div class="settings">
+          <label>
+            用户头像
+            <input type="file" id="userAvatarFile" accept="image/*" />
+          </label>
+          <label>
+            助手头像
+            <input type="file" id="assistantAvatarFile" accept="image/*" />
+          </label>
+          <label>
+            聊天背景色
+            <input type="color" id="bgColor" value="#ffeef6" />
+          </label>
+          <label>
+            背景图
+            <input type="file" id="bgImageInput" accept="image/*" />
+          </label>
+          <small>头像/背景均在本地读取，不会上传。</small>
         </div>
       </header>
 
       <div id="chatBody" class="chat-body">
         <div class="chat-empty">
           <div class="chat-empty-emoji">૮₍｡• ᴗ •｡₎ა</div>
-          <div>点右上角「⚙ → 导入聊天」，<br>左边选窗口，右边就会出现完整聊天记录哦。</div>
+          <div>把 ChatGPT 导出的聊天 JSON / 文本拖进来，<br>左边选窗口，右边就会出现完整聊天记录哦。</div>
         </div>
       </div>
 
       <footer class="main-footer">
         <span>提示：</span>仅展示 <code>user</code> / <code>assistant</code> 消息，忽略 system / tool，
-        空内容自动跳过。若导出文件里带模型字段，会显示在时间后面。会话列表按开始时间从新到旧排序；搜索框会根据内容过滤窗口并在聊天中高亮。
+        空内容自动跳过。若导出文件里带模型字段，会显示在时间后面。<br>
+        对于官方导出的 JSON，会沿着当前节点只取“最后那条主线”，不会把分支全部展开。
       </footer>
     </section>
   </div>
 
   <script>
     const state = {
-      conversations: [],   // {id,title,subtitle,firstTimeValue,messages:[...]}
+      conversations: [],
       activeId: null,
-      avatars: { user: "", assistant: "" },
-      searchQuery: ""
+      avatars: {
+        user: "",
+        assistant: ""
+      }
     };
 
     marked.setOptions({ breaks: true, gfm: true });
 
-    const sidebar = document.getElementById("sidebar");
-    const toggleSidebarBtn = document.getElementById("toggleSidebarBtn");
-    const toggleSettingsBtn = document.getElementById("toggleSettingsBtn");
-    const settingsPanel = document.getElementById("settingsPanel");
-
-    const searchInput = document.getElementById("searchInput");
-    const fileInputHeader = document.getElementById("fileInputHeader");
+    const fileInput = document.getElementById("fileInput");
     const conversationListEl = document.getElementById("conversationList");
     const chatBodyEl = document.getElementById("chatBody");
     const chatTitleEl = document.getElementById("chatTitle");
@@ -515,27 +468,8 @@
     const userAvatarFileInput = document.getElementById("userAvatarFile");
     const assistantAvatarFileInput = document.getElementById("assistantAvatarFile");
 
-    /* 侧栏 & 设置开关 */
-    toggleSidebarBtn.addEventListener("click", () => {
-      if (window.innerWidth > 900) return;
-      sidebar.classList.toggle("open");
-    });
+    fileInput.addEventListener("change", handleFiles, false);
 
-    toggleSettingsBtn.addEventListener("click", () => {
-      settingsPanel.classList.toggle("collapsed");
-    });
-    if (window.innerWidth > 900) {
-      settingsPanel.classList.remove("collapsed");
-    }
-
-    /* 搜索输入 */
-    searchInput.addEventListener("input", (e) => {
-      state.searchQuery = e.target.value.trim();
-      renderConversationList();
-      renderActiveConversation();
-    });
-
-    /* 外观设置 */
     bgColorInput.addEventListener("input", (e) => {
       document.documentElement.style.setProperty("--chat-bg", e.target.value);
       document.body.style.backgroundColor = e.target.value;
@@ -573,11 +507,6 @@
       reader.readAsDataURL(file);
     });
 
-    /* 导入文件 */
-    if (fileInputHeader) {
-      fileInputHeader.addEventListener("change", handleFiles, false);
-    }
-
     function handleFiles(e) {
       const files = Array.from(e.target.files || []);
       if (!files.length) return;
@@ -590,7 +519,7 @@
           try {
             const json = JSON.parse(text);
             convs = parseFromJsonExport(json, file.name);
-          } catch (_) {
+          } catch (err) {
             convs = [parseFromTextTranscript(text, file.name)];
           }
 
@@ -598,8 +527,6 @@
             if (!c.messages || !c.messages.length) return;
             state.conversations.push(c);
           });
-
-          sortConversationsByTime();
 
           if (!state.activeId && state.conversations.length) {
             state.activeId = state.conversations[0].id;
@@ -612,32 +539,31 @@
       });
     }
 
-    function sortConversationsByTime() {
-      state.conversations.sort(
-        (a, b) => (b.firstTimeValue || 0) - (a.firstTimeValue || 0)
-      );
-    }
-
-    /* ---- JSON 主线解析 ---- */
+    /* ----------- 解析 JSON：只取“最后主线” + 模型 ----------- */
     function parseFromJsonExport(json, filename) {
       const convs = [];
       let arr = [];
 
-      if (Array.isArray(json)) arr = json;
-      else if (Array.isArray(json.conversations)) arr = json.conversations;
-      else if (json.mapping && json.title) arr = [json];
-      else return [];
+      if (Array.isArray(json)) {
+        arr = json;
+      } else if (Array.isArray(json.conversations)) {
+        arr = json.conversations;
+      } else if (json.mapping && json.title) {
+        arr = [json];
+      } else {
+        return [];
+      }
 
       arr.forEach((conv, index) => {
         const title = conv.title || `${stripExt(filename)} #${index + 1}`;
         const messages = [];
-        let firstRawTime = null;
 
         if (conv.mapping) {
           const mapping = conv.mapping;
+          // 如果有 current_node：从 current_node 一路向上走父节点，只取这一条主线
           if (conv.current_node && mapping[conv.current_node]) {
-            const pathNodes = buildMainPath(mapping, conv.current_node);
-            pathNodes.forEach((node, idx) => {
+            const pathNodes = buildMainPath(mapping, conv.current_node); // 已按时间顺序
+            pathNodes.forEach((node) => {
               const msg = node.message;
               if (!msg) return;
               const author = msg.author || {};
@@ -657,16 +583,19 @@
               const trimmed = (content || "").trim();
               if (!trimmed) return;
 
-              const rawTime = msg.create_time != null ? msg.create_time : idx;
-              const timestamp = msg.create_time
-                ? formatTimestampFromSeconds(msg.create_time)
-                : "";
-              if (firstRawTime == null) firstRawTime = rawTime;
+              const rawTime = msg.create_time || 0;
+              const timestamp = rawTime ? formatTimestampFromSeconds(rawTime) : "";
               const model = detectModel(msg);
 
-              messages.push({ role, timestamp, content: trimmed, model });
+              messages.push({
+                role,
+                timestamp,
+                content: trimmed,
+                model
+              });
             });
           } else {
+            // 没有 current_node，就退回到“全部节点按时间排”的老逻辑
             const temp = [];
             Object.values(mapping).forEach((node) => {
               if (!node || !node.message) return;
@@ -687,18 +616,21 @@
               const trimmed = (content || "").trim();
               if (!trimmed) return;
 
-              const rawTime = msg.create_time != null ? msg.create_time : 0;
-              const timestamp = msg.create_time
-                ? formatTimestampFromSeconds(msg.create_time)
-                : "";
+              const rawTime = msg.create_time || 0;
+              const timestamp = rawTime ? formatTimestampFromSeconds(rawTime) : "";
               const model = detectModel(msg);
 
-              temp.push({ role, timestamp, content: trimmed, model, _rawTime: rawTime });
+              temp.push({
+                role,
+                timestamp,
+                content: trimmed,
+                model,
+                _rawTime: rawTime
+              });
             });
 
             temp.sort((a, b) => (a._rawTime || 0) - (b._rawTime || 0));
-            temp.forEach((m, idx) => {
-              if (firstRawTime == null) firstRawTime = m._rawTime != null ? m._rawTime : idx;
+            temp.forEach((m) => {
               delete m._rawTime;
               messages.push(m);
             });
@@ -723,40 +655,37 @@
             const trimmed = (content || "").trim();
             if (!trimmed) return;
 
-            const rawTime = m.create_time != null ? m.create_time : idx;
+            const rawTime = m.create_time || idx;
             const timestamp = m.create_time
               ? formatTimestampFromSeconds(m.create_time)
               : "";
             const model = detectModel(m);
 
-            temp.push({ role, timestamp, content: trimmed, model, _rawTime: rawTime });
+            temp.push({
+              role,
+              timestamp,
+              content: trimmed,
+              model,
+              _rawTime: rawTime
+            });
           });
 
           temp.sort((a, b) => (a._rawTime || 0) - (b._rawTime || 0));
-          temp.forEach((m, idx) => {
-            if (firstRawTime == null) firstRawTime = m._rawTime != null ? m._rawTime : idx;
+          temp.forEach((m) => {
             delete m._rawTime;
             messages.push(m);
           });
         }
 
         if (messages.length) {
-          const firstTimeStr = messages[0].timestamp || "";
-          const firstVal =
-            firstRawTime != null
-              ? firstRawTime
-              : firstTimeStr
-              ? parseTimeStringToSeconds(firstTimeStr)
-              : 0;
-
+          const firstTime = messages[0].timestamp || "";
           convs.push({
             id: conv.id || `${filename}-${index}`,
             title,
-            subtitle: firstTimeStr
-              ? `从 ${firstTimeStr} 开始 · ${messages.length} 条消息`
+            subtitle: firstTime
+              ? `从 ${firstTime} 开始 · ${messages.length} 条消息`
               : `${messages.length} 条消息`,
-            messages,
-            firstTimeValue: firstVal
+            messages
           });
         }
       });
@@ -764,6 +693,7 @@
       return convs;
     }
 
+    // 从 current_node 一路向上追 parent，最后反转，得到一条主线
     function buildMainPath(mapping, currentId) {
       const path = [];
       const seen = new Set();
@@ -778,6 +708,7 @@
       return path.reverse();
     }
 
+    // 可能的模型字段来源：metadata.model / metadata.model_slug / model / model_slug
     function detectModel(msg) {
       const md = msg.metadata || {};
       return (
@@ -789,22 +720,19 @@
       );
     }
 
-    /* 文本转录： 【user】[YYYY-MM-DD HH:MM:SS] 内容… */
+    // 文本转录格式： 【user】[2025-06-29 05:35:19] 内容……
     function parseFromTextTranscript(text, filename) {
       const messages = [];
-      const re = /【(user|assistant)】\s*\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]\s*([\s\S]*?)(?=\n【(?:user|assistant)】\s*\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]|$)/g;
+      const re =
+        /【(user|assistant)】\s*\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]\s*([\s\S]*?)(?=\n【(?:user|assistant)】\s*\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]|$)/g;
 
       let match;
-      let firstVal = null;
-
       while ((match = re.exec(text)) !== null) {
         const role = match[1];
         const ts = match[2];
         const contentRaw = match[3] || "";
         const content = contentRaw.trim();
         if (!content) continue;
-        const val = parseTimeStringToSeconds(ts);
-        if (firstVal == null) firstVal = val;
         messages.push({ role, timestamp: ts, content, model: "" });
       }
 
@@ -814,8 +742,7 @@
         subtitle: messages.length
           ? `从 ${messages[0].timestamp} 开始 · ${messages.length} 条消息`
           : "未解析到有效消息",
-        messages,
-        firstTimeValue: firstVal || 0
+        messages
       };
     }
 
@@ -835,35 +762,12 @@
       return `${y}-${m}-${day} ${h}:${mi}:${s}`;
     }
 
-    function parseTimeStringToSeconds(ts) {
-      const m = ts.match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/);
-      if (!m) return 0;
-      const y = Number(m[1]);
-      const mo = Number(m[2]) - 1;
-      const d = Number(m[3]);
-      const h = Number(m[4]);
-      const mi = Number(m[5]);
-      const s = Number(m[6]);
-      return Date.UTC(y, mo, d, h, mi, s) / 1000;
-    }
-
-    /* 渲染会话列表（带搜索过滤） */
+    /* ----------- 渲染 ----------- */
     function renderConversationList() {
       conversationListEl.innerHTML = "";
       if (!state.conversations.length) return;
 
-      const q = state.searchQuery.toLowerCase();
-      let list = state.conversations.slice();
-
-      if (q) {
-        list = list.filter((conv) =>
-          conv.messages.some((m) =>
-            (m.content || "").toLowerCase().includes(q)
-          )
-        );
-      }
-
-      list.forEach((conv) => {
+      state.conversations.forEach((conv) => {
         const item = document.createElement("div");
         item.className = "conversation-item";
         if (conv.id === state.activeId) item.classList.add("active");
@@ -882,7 +786,6 @@
           state.activeId = conv.id;
           renderConversationList();
           renderActiveConversation();
-          if (window.innerWidth <= 900) sidebar.classList.remove("open");
         });
 
         conversationListEl.appendChild(item);
@@ -896,17 +799,13 @@
       return parts.join(" · ");
     }
 
-    function escapeRegExp(str) {
-      return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    }
-
     function renderActiveConversation() {
       const conv = state.conversations.find((c) => c.id === state.activeId);
 
       if (!conv) {
         chatTitleEl.textContent = "还没有打开会话";
         chatSubtitleEl.textContent =
-          "导入聊天文件并在左侧选择一个会话，就能开始回顾聊天啦。";
+          "左侧导入并选择一个会话，就能开始回顾聊天啦。";
         chatBodyEl.innerHTML = `
           <div class="chat-empty">
             <div class="chat-empty-emoji">₍ᐢ. ̫ .ᐢ₎</div>
@@ -920,9 +819,6 @@
       chatSubtitleEl.textContent = conv.subtitle || "";
 
       chatBodyEl.innerHTML = "";
-
-      const q = state.searchQuery.trim();
-      const highlightRegex = q ? new RegExp(escapeRegExp(q), "gi") : null;
 
       conv.messages.forEach((msg) => {
         const row = document.createElement("div");
@@ -952,15 +848,8 @@
         contentDiv.className = "markdown-body";
         try {
           contentDiv.innerHTML = marked.parse(msg.content);
-        } catch {
+        } catch (e) {
           contentDiv.textContent = msg.content;
-        }
-
-        if (highlightRegex) {
-          contentDiv.innerHTML = contentDiv.innerHTML.replace(
-            highlightRegex,
-            (m) => `<mark>${m}</mark>`
-          );
         }
 
         bubble.appendChild(contentDiv);
