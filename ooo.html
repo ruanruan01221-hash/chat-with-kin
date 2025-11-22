@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>ChatGPT 聊天记录查看器 · Pop Style</title>
     <!--
-      👑 Kin-modded version · 2025-11-22
-      基于弥雅Miaaa@RedNote 原版，调整配色 / 气泡 / 箭头，使之更贴近
-      用户提供的 POP 糖果系 LINE 聊天界面。仅改动 CSS，其余逻辑保持不变。
+      👑 Kin-modded v2 · 2025-11-22
+      ▶ 主要修正：
+        1. 用  !important  提升优先级，覆盖原脚本写入的 inline 背景渐变。
+        2. 预设淡粉底、气泡圆角、POP 糖果系色块。
+      ▶ JS / 结构未动，直接把原 index.html 其余部分完整塞进 <body> 注释处即可运行。
     -->
     <style>
       /* ---------- 主题变量 ---------- */
@@ -31,8 +33,6 @@
         /* 通用 */
         --shadow: 0 6px 18px rgba(0, 0, 0, .06);
         --radius: 20px;
-        --sidebar-w: 280px;
-        --wm-owner: "Kin-mod";
       }
 
       /* ---------- Reset 与布局保持原样 ---------- */
@@ -40,7 +40,7 @@
       html, body { height: 100%; margin: 0; overflow-x: hidden; background: var(--bg); font: 15px/1.6 ui-sans-serif, -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans CJK SC", Inter, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; color: var(--text); }
 
       /* ---------- 侧栏（轻量收窄） ---------- */
-      .app { display: grid; grid-template-columns: var(--sidebar-w) minmax(0, 1fr); height: 100vh; overflow-x: hidden; }
+      .app { display: grid; grid-template-columns: 280px minmax(0, 1fr); height: 100vh; overflow-x: hidden; }
       .sidebar { background: linear-gradient(160deg, #fff, #fff6fb 30%, #f4fbff 80%); border-right: 1px solid rgba(0, 0, 0, .05); overflow: auto; }
 
       /* ---------- 顶栏 ---------- */
@@ -59,39 +59,28 @@
 
       /* 用户（右侧） */
       .role.user { justify-content: flex-end; }
-      .role.user .bubble { max-width: 70%; margin-left: auto; background: var(--bubble-user); border: 1px solid rgba(0, 0, 0, .05); padding: 12px 14px; border-radius: var(--radius); box-shadow: var(--shadow); position: relative; word-wrap: break-word; }
-      /* 右侧箭头 */
+      .role.user .bubble { max-width: 70%; margin-left: auto; background: var(--bubble-user) !important; border: 1px solid rgba(0, 0, 0, .05) !important; padding: 12px 14px; border-radius: var(--radius); box-shadow: var(--shadow); position: relative; word-wrap: break-word; }
       .role.user .bubble::after { content: ""; position: absolute; right: -6px; top: 16px; border-width: 8px 0 8px 8px; border-style: solid; border-color: transparent transparent transparent #ffd5a3; }
 
       /* Assistant（左侧） */
       .assistant { width: 100%; padding: 0; }
       .assistant .md { position: relative; background: var(--bubble-assistant); border: 1px solid rgba(0, 0, 0, .05); padding: 12px 14px; border-radius: var(--radius); box-shadow: var(--shadow); word-wrap: break-word; }
-      /* 左侧箭头 */
       .assistant .md::before { content: ""; position: absolute; left: -6px; top: 16px; border-width: 8px 8px 8px 0; border-style: solid; border-color: transparent #ffffff transparent transparent; }
 
-      /* 通用 markdown 样式简化（保留原规则） */
+      /* Markdown 简化 */
       .md h1, .md h2, .md h3 { line-height: 1.25; margin: 16px 0 8px; }
       .md p { margin: 12px 0; white-space: pre-wrap; }
       .md pre { background: #4f3356c9; color: #f5f7ff; padding: 14px; border-radius: 12px; overflow-x: auto; border: 1px solid rgba(255, 255, 255, .08); }
       .md code { background: #f7f7fb; border: 1px solid rgba(0, 0, 0, .08); padding: .15em .35em; border-radius: 6px; font-size: .9em; }
 
-      /* 去除过深阴影 & 适配移动端 */
+      /* Mobile 优化 */
       @media (max-width: 900px) {
         .chat { padding: 14px; }
         .role.user .bubble, .assistant .md { border-radius: 18px; }
       }
     </style>
   </head>
-  <!--
-    ⚠️ 其余 HTML 结构 & <script> 与原版完全一致，逻辑未动。
-    为减小阅读体积，此处省略不变部分，请将下方「<!-- more original content -->」替换为原 index.html 中的内容。
-  -->
   <body>
-    <div class="app">
-      <!-- 侧栏 & 主内容的结构保持，原版 HTML 此处完整搬运 -->
-      <!-- more original content -->
-    </div>
-    <!-- 原版所有 JS 脚本在此处粘贴，逻辑不变 -->
-    <!-- more original script -->
+    <!-- ✨ 在此处粘贴原始 index.html 完整 <body> 内容即可运行，不用动上面的样式 -->
   </body>
 </html>
