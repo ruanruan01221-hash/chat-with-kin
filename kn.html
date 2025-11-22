@@ -81,10 +81,7 @@
       line-height: 1.4;
     }
 
-    .search-box {
-      margin-top: 10px;
-    }
-
+    .search-box { margin-top: 10px; }
     .search-input {
       width: 100%;
       padding: 6px 10px;
@@ -94,10 +91,7 @@
       outline: none;
       background: rgba(255,255,255,0.9);
     }
-
-    .search-input::placeholder {
-      color: #c9a2bb;
-    }
+    .search-input::placeholder { color: #c9a2bb; }
 
     .conversation-list {
       flex: 1;
@@ -115,9 +109,7 @@
       gap: 4px;
       transition: all 0.15s ease;
     }
-
     .conversation-item:hover { background: rgba(255, 224, 239, 0.7); }
-
     .conversation-item.active {
       background: #ffd8eb;
       box-shadow: 0 0 0 1px #ff9ac6 inset;
@@ -131,7 +123,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
     .conversation-meta {
       font-size: 11px;
       color: var(--text-sub);
@@ -139,7 +130,6 @@
       justify-content: space-between;
       align-items: center;
     }
-
     .badge {
       padding: 2px 6px;
       border-radius: 999px;
@@ -185,7 +175,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
     .chat-subtitle {
       font-size: 11px;
       color: #aa889c;
@@ -217,7 +206,6 @@
       align-items: flex-start;
       gap: 6px;
     }
-
     .settings-toggle-label {
       font-size: 11px;
       color: #a67792;
@@ -233,7 +221,6 @@
       font-size: 11px;
       color: #a07f94;
     }
-
     .settings.collapsed { display: none; }
 
     .settings label {
@@ -257,7 +244,6 @@
       background: transparent;
       cursor: pointer;
     }
-
     .settings small {
       color: #c09ab0;
       font-size: 10px;
@@ -281,7 +267,6 @@
       font-size: 13px;
       text-align: center;
     }
-
     .chat-empty-emoji { font-size: 32px; }
 
     .message-row {
@@ -290,7 +275,6 @@
       margin-bottom: 10px;
       gap: 8px;
     }
-
     .message-row.assistant { flex-direction: row; }
     .message-row.user { flex-direction: row-reverse; }
 
@@ -308,7 +292,6 @@
       justify-content: center;
       font-size: 16px;
     }
-
     .avatar.assistant { background-color: #ffffff; color: #ff83b8; }
     .avatar.user { background-color: #ffbcd8; color: #ffffff; }
 
@@ -318,7 +301,6 @@
       flex-direction: column;
       align-items: flex-start;
     }
-
     .message-row.user .bubble-wrapper { align-items: flex-end; }
 
     .bubble {
@@ -332,12 +314,10 @@
         0 0 0 0.5px rgba(255, 255, 255, 0.8);
       word-break: break-word;
     }
-
     .message-row.assistant .bubble {
       background: var(--assistant-bubble);
       border-bottom-left-radius: 6px;
     }
-
     .message-row.user .bubble {
       background: var(--user-bubble);
       border-bottom-right-radius: 6px;
@@ -345,14 +325,12 @@
 
     .bubble .markdown-body p { margin: 0 0 4px; }
     .bubble .markdown-body p:last-child { margin-bottom: 0; }
-
     .bubble .markdown-body code {
       background: rgba(0, 0, 0, 0.04);
       padding: 1px 4px;
       border-radius: 4px;
       font-size: 12px;
     }
-
     .bubble .markdown-body pre {
       background: #1e1e1e;
       color: #f4f4f4;
@@ -361,26 +339,22 @@
       overflow-x: auto;
       font-size: 12px;
     }
-
     .bubble .markdown-body ul,
     .bubble .markdown-body ol {
       margin: 0 0 4px 18px;
       padding: 0;
     }
-
     .bubble .markdown-body h1,
     .bubble .markdown-body h2,
     .bubble .markdown-body h3 {
       margin: 4px 0;
       font-size: 15px;
     }
-
     .bubble .markdown-body a {
       color: #e16ea5;
       text-decoration: none;
       border-bottom: 1px dashed #e16ea5;
     }
-
     .bubble .markdown-body a:hover { text-decoration: underline; }
 
     .meta-line {
@@ -390,7 +364,7 @@
     }
     .message-row.user .meta-line { text-align: right; }
 
-    /* 搜索命中高亮 */
+    /* 搜索高亮 */
     mark {
       background: #ffe07f;
       color: inherit;
@@ -449,7 +423,7 @@
           <span>ChatGPT 聊天列表</span>
         </div>
         <div class="sidebar-sub">
-          请在右上角 <b>⚙ → 导入聊天</b> 选择导出的 JSON / 文本文件，这里只用来选择会话窗口。
+          请在右上角 <b>⚙ → 导入聊天</b> 选择导出的 JSON / 文本文件，会话按开始时间从新到旧排序。
         </div>
         <div class="search-box">
           <input id="searchInput" class="search-input" type="text" placeholder="搜索聊天内容…" />
@@ -509,15 +483,14 @@
 
       <footer class="main-footer">
         <span>提示：</span>仅展示 <code>user</code> / <code>assistant</code> 消息，忽略 system / tool，
-        空内容自动跳过。若导出文件里带模型字段，会显示在时间后面。<br>
-        对于官方导出的 JSON，会沿着当前节点只取“最后那条主线”，不会把分支全部展开。会话列表按开始时间从新到旧排序。
+        空内容自动跳过。若导出文件里带模型字段，会显示在时间后面。会话列表按开始时间从新到旧排序；搜索框会根据内容过滤窗口并在聊天中高亮。
       </footer>
     </section>
   </div>
 
   <script>
     const state = {
-      conversations: [],   // {id,title,subtitle,firstTimeValue,messages:[{...}]}
+      conversations: [],   // {id,title,subtitle,firstTimeValue,messages:[...]}
       activeId: null,
       avatars: { user: "", assistant: "" },
       searchQuery: ""
@@ -543,11 +516,10 @@
     const assistantAvatarFileInput = document.getElementById("assistantAvatarFile");
 
     /* 侧栏 & 设置开关 */
-    function toggleSidebar() {
+    toggleSidebarBtn.addEventListener("click", () => {
       if (window.innerWidth > 900) return;
       sidebar.classList.toggle("open");
-    }
-    toggleSidebarBtn.addEventListener("click", toggleSidebar);
+    });
 
     toggleSettingsBtn.addEventListener("click", () => {
       settingsPanel.classList.toggle("collapsed");
@@ -560,10 +532,10 @@
     searchInput.addEventListener("input", (e) => {
       state.searchQuery = e.target.value.trim();
       renderConversationList();
-      renderActiveConversation(); // 让右侧高亮跟着变
+      renderActiveConversation();
     });
 
-    /* 颜色 & 背景 */
+    /* 外观设置 */
     bgColorInput.addEventListener("input", (e) => {
       document.documentElement.style.setProperty("--chat-bg", e.target.value);
       document.body.style.backgroundColor = e.target.value;
@@ -579,7 +551,6 @@
       reader.readAsDataURL(file);
     });
 
-    /* 头像上传 */
     userAvatarFileInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -603,7 +574,9 @@
     });
 
     /* 导入文件 */
-    if (fileInputHeader) fileInputHeader.addEventListener("change", handleFiles, false);
+    if (fileInputHeader) {
+      fileInputHeader.addEventListener("change", handleFiles, false);
+    }
 
     function handleFiles(e) {
       const files = Array.from(e.target.files || []);
@@ -645,7 +618,7 @@
       );
     }
 
-    /* ------- 解析 JSON：只取主线 + 模型 + 开始时间 ------- */
+    /* ---- JSON 主线解析 ---- */
     function parseFromJsonExport(json, filename) {
       const convs = [];
       let arr = [];
@@ -684,11 +657,10 @@
               const trimmed = (content || "").trim();
               if (!trimmed) return;
 
-              const rawTime = msg.create_time ?? idx;
+              const rawTime = msg.create_time != null ? msg.create_time : idx;
               const timestamp = msg.create_time
                 ? formatTimestampFromSeconds(msg.create_time)
                 : "";
-
               if (firstRawTime == null) firstRawTime = rawTime;
               const model = detectModel(msg);
 
@@ -715,7 +687,7 @@
               const trimmed = (content || "").trim();
               if (!trimmed) return;
 
-              const rawTime = msg.create_time ?? 0;
+              const rawTime = msg.create_time != null ? msg.create_time : 0;
               const timestamp = msg.create_time
                 ? formatTimestampFromSeconds(msg.create_time)
                 : "";
@@ -726,7 +698,7 @@
 
             temp.sort((a, b) => (a._rawTime || 0) - (b._rawTime || 0));
             temp.forEach((m, idx) => {
-              if (firstRawTime == null) firstRawTime = m._rawTime ?? idx;
+              if (firstRawTime == null) firstRawTime = m._rawTime != null ? m._rawTime : idx;
               delete m._rawTime;
               messages.push(m);
             });
@@ -751,7 +723,7 @@
             const trimmed = (content || "").trim();
             if (!trimmed) return;
 
-            const rawTime = m.create_time ?? idx;
+            const rawTime = m.create_time != null ? m.create_time : idx;
             const timestamp = m.create_time
               ? formatTimestampFromSeconds(m.create_time)
               : "";
@@ -762,7 +734,7 @@
 
           temp.sort((a, b) => (a._rawTime || 0) - (b._rawTime || 0));
           temp.forEach((m, idx) => {
-            if (firstRawTime == null) firstRawTime = m._rawTime ?? idx;
+            if (firstRawTime == null) firstRawTime = m._rawTime != null ? m._rawTime : idx;
             delete m._rawTime;
             messages.push(m);
           });
@@ -817,11 +789,10 @@
       );
     }
 
-    /* 文本转录格式解析： 【user】[YYYY-MM-DD HH:MM:SS] 内容… */
+    /* 文本转录： 【user】[YYYY-MM-DD HH:MM:SS] 内容… */
     function parseFromTextTranscript(text, filename) {
       const messages = [];
-      const re =
-        /【(user|assistant)】\s*\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]\s*([\s\S]*?)(?=\n【(?:user|assistant)】\s*\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]|$)/g;
+      const re = /【(user|assistant)】\s*\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]\s*([\s\S]*?)(?=\n【(?:user|assistant)】\s*\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]|$)/g;
 
       let match;
       let firstVal = null;
@@ -844,7 +815,7 @@
           ? `从 ${messages[0].timestamp} 开始 · ${messages.length} 条消息`
           : "未解析到有效消息",
         messages,
-        firstTimeValue: firstVal ?? 0
+        firstTimeValue: firstVal || 0
       };
     }
 
@@ -865,23 +836,18 @@
     }
 
     function parseTimeStringToSeconds(ts) {
-      // "YYYY-MM-DD HH:MM:SS" -> UTC 秒
-      const m = ts.match(
-        /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/
-      );
+      const m = ts.match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/);
       if (!m) return 0;
-      const [_, y, mo, d, h, mi, s] = m;
-      return Date.UTC(
-        Number(y),
-        Number(mo) - 1,
-        Number(d),
-        Number(h),
-        Number(mi),
-        Number(s)
-      ) / 1000;
+      const y = Number(m[1]);
+      const mo = Number(m[2]) - 1;
+      const d = Number(m[3]);
+      const h = Number(m[4]);
+      const mi = Number(m[5]);
+      const s = Number(m[6]);
+      return Date.UTC(y, mo, d, h, mi, s) / 1000;
     }
 
-    /* ------- 渲染会话列表（带搜索过滤） ------- */
+    /* 渲染会话列表（带搜索过滤） */
     function renderConversationList() {
       conversationListEl.innerHTML = "";
       if (!state.conversations.length) return;
@@ -990,7 +956,6 @@
           contentDiv.textContent = msg.content;
         }
 
-        // 搜索词高亮
         if (highlightRegex) {
           contentDiv.innerHTML = contentDiv.innerHTML.replace(
             highlightRegex,
